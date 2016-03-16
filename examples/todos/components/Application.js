@@ -10,7 +10,6 @@ const Application = ({ render, todos }) => (
     <AddTodo
       onadd={(text) => {
         todos.push(text);
-
         // re-render app with new state
         render({ todos });
       }}
