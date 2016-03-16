@@ -11,6 +11,10 @@ import Application from './components/Application';
 function renderApplication(state) {
   render(
     <Application
+      // we pass a function to re-render the app
+      // but that's just one convention. lazy-dom
+      // doesn't make any assumptions so you could
+      // just as easily use a flux/redux style
       render={renderApplication}
       todos={state.todos}
     />,
