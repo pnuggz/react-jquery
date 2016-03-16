@@ -6,11 +6,13 @@ import TodoList from './TodoList';
 
 const Application = ({ render, todos }) => (
   <div>
-    <h1>hello world</h1>
+    <h1>My Todos</h1>
     <AddTodo
       onadd={(text) => {
         todos.push(text);
-        render();
+
+        // re-render app with new state
+        render({ todos });
       }}
     />
     <TodoList todos={todos} />
