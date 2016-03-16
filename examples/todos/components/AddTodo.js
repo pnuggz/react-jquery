@@ -7,6 +7,8 @@ const AddTodo = ({ onadd }) => {
 
   return (
     <div>
+      {/* you can treat lazy-dom JSX elements as
+          if they were actual DOM nodes! */}
       {input = <input />}
       <button
         onclick={() => {
