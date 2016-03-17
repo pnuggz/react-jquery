@@ -111,6 +111,9 @@ function createElement(type, props, ...children) {
 
   switch (typeof type) {
     case 'string':
+      // Theoretically we could create a mock HTMLElement with
+      // every property in the spec as a getter/setter
+      // which would have better browser support. Maybe later?
       return new Proxy({
         [$$METHODS]: elementMethodHandlers,
         [$$PROPS]: {
