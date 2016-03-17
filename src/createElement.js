@@ -31,19 +31,30 @@ function throwDOMException(methodName, message) {
 
 const elementMethodHandlers = {
   appendChild(childNode) {
-    this[$$PROPS].children.push(childNode);
+    const node = this[$$NODE];
+    if (node) {
+      node.appendChild(childNode);
+    } else {
+      this[$$PROPS].children.push(childNode);
+    }
+
     return childNode;
   },
 
   removeChild(childNode) {
-    const { children } = this[$$PROPS];
-    const childIndex = children.indexOf(childNode);
+    const node = this[$$NODE];
+    if (node) {
+      node.removeChild(childNode);
+    } else {
+      const { children } = this[$$PROPS];
+      const childIndex = children.indexOf(childNode);
 
-    if (childIndex === -1) {
-      throwDOMException('removeChild', 'The node to be removed is not a child of this node.');
+      if (childIndex === -1) {
+        throwDOMException('removeChild', 'The node to be removed is not a child of this node.');
+      }
+
+      children.splice(childIndex, 1);
     }
-
-    children.splice(childIndex, 1);
 
     return childNode;
   }
@@ -76,16 +87,7 @@ const elementProxyHandler = {
         target[$$NODE] = document.createElement(props.tagName)
       );
 
-      let value = node[key];
-
-      // Currently not the right behavior
-      /*
-      if (typeof value === 'function') {
-        value = value.bind(node);
-      }
-      */
-
-      return value;
+      return node[key];
     }
   },
 
