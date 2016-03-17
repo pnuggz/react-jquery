@@ -9,6 +9,7 @@ import Application from './components/Application';
 // handle state, just re-render whenever
 // state changes!
 function renderApplication(state) {
+  const start = performance.now();
   render(
     <Application
       // we pass a function to re-render the app
@@ -20,6 +21,10 @@ function renderApplication(state) {
     />,
     document.getElementById('container')
   );
+
+  // rendering is currently synchronous
+  const finish = performance.now();
+  console.log('render', finish-start + ' ms');
 }
 
 // Kick off initial render with initial state

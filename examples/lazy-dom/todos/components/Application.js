@@ -6,7 +6,7 @@ import TodoList from './TodoList';
 
 const Application = ({ render, todos }) => (
   <div>
-    <h1>My Todos</h1>
+    <h1>My Todos (lazy-dom)</h1>
     <AddTodo
       onadd={(text) => {
         todos.push(text);

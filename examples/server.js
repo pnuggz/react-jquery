@@ -20,13 +20,21 @@ app.use(
 var fs = require('fs');
 var path = require('path');
 
-fs.readdirSync(__dirname).forEach(function (file) {
-  if (fs.statSync(path.join(__dirname, file)).isDirectory()) {
-    app.use(
-      rewrite('/' + file + '/*', '/' + file + '/index.html')
-    );
-  }
-});
+var lazyDOMDir = path.join(__dirname, 'lazy-dom');
+var reactDir = path.join(__dirname, 'react');
+
+function serveDir(rootDir) {
+  fs.readdirSync(rootDir).forEach(function (file) {
+    if (fs.statSync(path.join(rootDir, file)).isDirectory()) {
+      app.use(
+        rewrite('/' + file + '/*', '/' + file + '/index.html')
+      );
+    }
+  });
+}
+
+serveDir(lazyDOMDir);
+serveDir(reactDir);
 
 app.use(express.static(__dirname));
 
