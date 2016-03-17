@@ -1,3 +1,6 @@
+import { createClass } from 'react';
+import { render, findDOMNode } from 'react-dom';
+
 $.fn.counter = function counter() {
   let count = 0;
 
@@ -15,9 +18,9 @@ $.fn.counter = function counter() {
   return this;
 };
 
-const Application = React.createClass({
+const Application = createClass({
   componentDidMount() {
-    const counterElement = ReactDOM.findDOMNode(this.refs.counter);
+    const counterElement = findDOMNode(this.refs.counter);
     // jQuery plugins need access to the real
     // DOM node and some manipulate the DOM
     // which in certain cases breaks React
@@ -34,7 +37,4 @@ const Application = React.createClass({
   }
 });
 
-ReactDOM.render(
-  <Application />,
-  document.getElementById('container')
-);
+render(<Application />, document.getElementById('container'));

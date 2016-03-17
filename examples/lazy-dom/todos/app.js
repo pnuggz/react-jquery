@@ -1,13 +1,11 @@
-/** @jsx createElement */
-
-import { createElement, render } from 'lazy-dom';
+import { render } from 'lazy-dom';
 import Application from './components/Application';
 
 // For simplicity's sake, we're accepting the
 // application state here and passing it down
 // lazy-dom makes no assumptions on how you
 // handle state, just re-render whenever
-// state changes!
+// state changes. (There is no `this.setState`)
 function renderApplication(state) {
   const start = performance.now();
   render(

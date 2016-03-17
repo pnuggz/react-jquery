@@ -35,6 +35,10 @@ module.exports = {
       'lazy-dom': path.join(__dirname, '..', 'src')
     }
   },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM'
+  },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin('shared.js'),
     new webpack.DefinePlugin({

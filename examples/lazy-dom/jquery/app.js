@@ -1,6 +1,3 @@
-/** @jsx createElement */
-import { createElement, render } from 'lazy-dom';
-
 $.fn.counter = function counter() {
   let count = 0;
 
@@ -33,7 +30,4 @@ const Application = () => {
   );
 };
 
-render(
-  <Application />,
-  document.getElementById('container')
-);
+document.body.appendChild(<Application />);
