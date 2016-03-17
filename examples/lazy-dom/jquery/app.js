@@ -9,7 +9,7 @@ $.fn.counter = function counter() {
 
   $button.on('click', () => {
     count++
-    $count.text(count);
+    $count.text(`${count}`);
   });
 
   this.append($count);
@@ -33,18 +33,7 @@ const Application = () => {
   );
 };
 
-//var div = <div>suchwow</div>;
-//document.body.appendChild(div);
-
 render(
   <Application />,
   document.getElementById('container')
 );
-
-
-setTimeout(() => {
-  render(
-  <Application />,
-  document.getElementById('container')
-);
-}, 2000);
