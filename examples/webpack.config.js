@@ -36,9 +36,6 @@ module.exports = {
     }
   },
   plugins: [
-    new webpack.ProvidePlugin({
-        'Proxy': 'imports?this=>global!exports?global.Proxy!proxy-polyfill'
-    }),
     new webpack.optimize.CommonsChunkPlugin('shared.js'),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')

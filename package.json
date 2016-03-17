@@ -37,7 +37,6 @@
     "karma-webpack": "^1.7.0",
     "lolex": "1.4.0",
     "mocha": "^2.3.3",
-    "proxy-polyfill": "0.1.2",
     "sinon": "^1.17.0",
     "sinon-chai": "^2.8.0",
     "source-map": "^0.5.1",
