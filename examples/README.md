@@ -24,3 +24,7 @@ Examples are written using lazy-dom and React so you can compare both the code a
 ### Todos
 
 [lazy-dom](lazy-dom/todos) | [React](react/todos)
+
+### DBMonster
+
+[lazy-dom](http://jayphelps.github.io/js-repaint-perfs/lazy-dom/) | [React](http://jayphelps.github.io/js-repaint-perfs/react/)
