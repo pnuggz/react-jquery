@@ -13,7 +13,7 @@ module.exports = {
     library: 'LazyDOM',
     libraryTarget: 'umd',
     path: dist,
-    filename: packageJSON + '.js',
+    filename: packageJSON.name + '.js',
   },
   module: {
     loaders: [{

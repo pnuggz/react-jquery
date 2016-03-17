@@ -4,12 +4,17 @@ export default
 function patchChildren(prevNode, nextNode, children, leftOversOverride) {
   const leftOvers = leftOversOverride || (prevNode ? [...prevNode.childNodes] : []);
 
+  let offset = 0;
+
   for (let i = 0, l = children.length; i < l; i++) {
     const childElement = children[i];
-    const prevChildNode = prevNode ? prevNode.childNodes[i] : null;
+    const prevChildNode = prevNode ? prevNode.childNodes[offset + i] : null;
 
     if (Array.isArray(childElement)) {
-      patchChildren(prevNode, nextNode, childElement, leftOvers);
+      children = [...childElement, ...children.slice(i + 1, l)];
+      offset += i;
+      l = children.length;
+      i = -1;
     } else {
       const prevChildNodeIndex = leftOvers.indexOf(prevChildNode);
 

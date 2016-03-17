@@ -1,6 +1,6 @@
 {
   "name": "lazy-dom",
-  "description": "A technical demonstration of what a browser-based \"virtual DOM\" might look like.",
+  "description": "A technology demonstration of what browser-supported DOM diffing and JSX might look like.",
   "version": "0.0.1",
   "license": "MIT",
   "main": "lib/lazy-dom.js",
@@ -10,10 +10,6 @@
     "build-prod": "NODE_ENV=production webpack -p",
     "test": "karma start"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/jayphelps/lazy-dom.git"
