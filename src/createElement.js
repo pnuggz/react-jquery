@@ -1,13 +1,44 @@
-import { $$node, $$props, $$methods, $$isStatic } from './symbols';
+import { $$isElement, $$node, $$props, $$methods, $$isStatic } from './symbols';
 import patchNode from './patchNode';
 
 {
   const nodeProto = Node.prototype;
+  const nativeAppendChild = nodeProto.appendChild;
+  const nativeRemoveChild = nodeProto.removeChild;
 
-  ['appendChild', 'removeChild'].forEach(key => {
+  function elementToNode(element) {
+    element = element[$$node];
+
+    if (!element) {
+      const template = document.createElement('template');
+      patchNode(null, element, template);
+      element = template.content.firstChild;
+    }
+
+    return element;
+  }
+
+  nodeProto.appendChild = function appendChild(childNode)  {
+    if (childNode[$$isElement]) {
+      childNode = elementToNode(childNode);
+    }
+
+    return nativeAppendChild.call(this, childNode);
+  };
+
+  nodeProto.removeChild = function removeChild(childNode)  {
+    if (childNode[$$isElement]) {
+      childNode = elementToNode(childNode);
+    }
+
+    return nativeRemoveChild.call(this, childNode);
+  };
+
+  /*
+  [].forEach(key => {
     const nativeMethod = nodeProto[key];
 
-    nodeProto[key] = function (...elements) {
+    nodeProto[key] = function () {
       const nodes = elements.map(element => {
         if (element[$$props]) {
           if (!element[$$node]) {
@@ -23,6 +54,7 @@ import patchNode from './patchNode';
       return nativeMethod.apply(this, nodes);
     };
   });
+  */
 }
 
 function throwDOMException(methodName, message) {
@@ -63,6 +95,7 @@ const elementMethodHandlers = {
 const elementProxyHandler = {
   get(target, key) {
     switch (key) {
+      case $$isElement:
       case $$node:
       case $$props:
       case $$isStatic:
@@ -105,24 +138,50 @@ const elementProxyHandler = {
   }
 };
 
+// These are used whenever the element creator doesn't
+// provide them, so that the API surface is always the
+// same but made completely immutable so they don't
+// cause really weird bugs
+const emptyChildren = Object.freeze([]);
+const emptyProps = Object.freeze({ children: emptyChildren });
+
+// Used later to convert `arguments` to an array
+const { slice } = Array.prototype;
+
 export default
-function createElement(type, props, ...children) {
-  props = props || {};
+function createElement(type, props) {
+  props = props || emptyProps;
+
+  /*const children = (arguments.length > 2)
+    ? slice.call(arguments, 2, arguments.length)
+    : emptyChildren;*/
+
+  let children = emptyChildren;
+
+  if (arguments.length > 2) {
+    const thirdChild = arguments[2];
+    if (arguments.length === 3 && thirdChild && thirdChild[$$isElement]) {
+      children = thirdChild;
+    } else {
+      children = slice.call(arguments, 2, arguments.length)
+    }
+  }
 
   switch (typeof type) {
     case 'symbol':
       return new Proxy({
-        [type]: true,
+        [$$isElement]: true,
+        [$$isStatic]: true,
         [$$methods]: elementMethodHandlers,
-        [$$props]: {
-          children
-        }
+        [$$props]: { children }
       }, elementProxyHandler);
+
     case 'string':
       // Theoretically we could create a mock HTMLElement with
       // every property in the spec as a getter/setter
       // which would have better browser support. Maybe later?
       return new Proxy({
+        [$$isElement]: true,
         [$$methods]: elementMethodHandlers,
         [$$props]: {
           ...props,
@@ -132,7 +191,16 @@ function createElement(type, props, ...children) {
       }, elementProxyHandler);
 
     case 'function':
-      props.children = children;
+      if (children) {
+        // Lazy allocation of a mutable props
+        // for memory conservation
+        if (props === emptyProps) {
+          props = {};
+        }
+
+        props.children = children;
+      }
+
       return type(props);
 
     default:

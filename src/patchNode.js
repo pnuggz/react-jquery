@@ -1,4 +1,4 @@
-import { $$node, $$props, $$isStatic } from './symbols';
+import { $$isElement, $$node, $$props, $$isStatic } from './symbols';
 import patchChildren from './patchChildren';
 
 function createStaticNode(elementAsString) {
@@ -28,9 +28,8 @@ function patchNode(prevNode, nextElement, parentNode) {
     return;
   }
 
-  const nextProps = nextElement[$$props];
-
-  if (nextProps) {
+  if (nextElement[$$isElement]) {
+    const nextProps = nextElement[$$props] || {};
     const { children } = nextProps;
 
     if (prevNode) {
@@ -49,6 +48,8 @@ function patchNode(prevNode, nextElement, parentNode) {
 
         const nextNode = nextElement[$$node];
 
+        // This doesn't do any diffing so is almost certainly wrong
+        // and lead to continous appending instead.
         if (nextNode && nextNode !== prevNode) {
           const { childNodes } = nextNode;
           for (let i = 0, l = childNodes.length; i < l; i++) {
@@ -80,12 +81,15 @@ function patchNode(prevNode, nextElement, parentNode) {
       return;
     }
 
-    const nextNode = (nextElement.nodeType > 0) ? nextElement : document.createTextNode(nextElement);
-
-    if (prevNode) {
-      parentNode.replaceChild(nextNode, prevNode);
+    if (nextElement.nodeType > 0) {
+      console.log(nextElement);
+      parentNode.appendChild(nextElement);
+    } else if (prevNode) {
+      prevNode.nodeValue = nextElement;
     } else {
-      parentNode.appendChild(nextNode);
+      parentNode.appendChild(
+        document.createTextNode(nextElement)
+      );
     }
   }
 }
