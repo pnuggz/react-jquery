@@ -1,7 +1,3 @@
-/** @jsx createElement */
-
-import { createElement } from 'lazy-dom';
-
 const AddTodo = ({ onadd }) => {
   let input;
 

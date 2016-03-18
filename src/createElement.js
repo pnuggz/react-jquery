@@ -1,4 +1,4 @@
-import { $$NODE, $$PROPS, $$METHODS } from './symbols';
+import { $$node, $$props, $$methods, $$isStatic } from './symbols';
 import patchNode from './patchNode';
 
 {
@@ -9,12 +9,12 @@ import patchNode from './patchNode';
 
     nodeProto[key] = function (...elements) {
       const nodes = elements.map(element => {
-        if (element[$$PROPS]) {
-          if (!element[$$NODE]) {
+        if (element[$$props]) {
+          if (!element[$$node]) {
             patchNode(null, element, document.createElement('x-temp-container'));
           }
 
-          return element[$$NODE];
+          return element[$$node];
         }
 
         return element;
@@ -31,22 +31,22 @@ function throwDOMException(methodName, message) {
 
 const elementMethodHandlers = {
   appendChild(childNode) {
-    const node = this[$$NODE];
+    const node = this[$$node];
     if (node) {
       node.appendChild(childNode);
     } else {
-      this[$$PROPS].children.push(childNode);
+      this[$$props].children.push(childNode);
     }
 
     return childNode;
   },
 
   removeChild(childNode) {
-    const node = this[$$NODE];
+    const node = this[$$node];
     if (node) {
       node.removeChild(childNode);
     } else {
-      const { children } = this[$$PROPS];
+      const { children } = this[$$props];
       const childIndex = children.indexOf(childNode);
 
       if (childIndex === -1) {
@@ -62,29 +62,27 @@ const elementMethodHandlers = {
 
 const elementProxyHandler = {
   get(target, key) {
-    // Used to return the actual underlying DOM node,
-    // which is stored on a secret Symbol
-    if (key === $$NODE) {
-      return target[$$NODE];
+    switch (key) {
+      case $$node:
+      case $$props:
+      case $$isStatic:
+        return target[key];
     }
 
-    // $$PROPS stores the props of the element that were provided or
+    // $$props stores the props of the element that were provided or
     // mutated at some point
-    const props = target[$$PROPS];
-    // $$METHODS stores Element method hooks
-    const methods = target[$$METHODS];
+    const props = target[$$props];
+    // $$methods stores Element method hooks
+    const methods = target[$$methods];
 
-    if (key === $$PROPS) {
-      return props;
-    }
 
     if (key in props) {
       return props[key];
     } else if (key in methods) {
       return methods[key];
     } else {
-      const node = target[$$NODE] || (
-        target[$$NODE] = document.createElement(props.tagName)
+      const node = target[$$node] || (
+        target[$$node] = document.createElement(props.tagName)
       );
 
       return node[key];
@@ -92,14 +90,14 @@ const elementProxyHandler = {
   },
 
   set(target, key, value) {
-    if (key === $$NODE) {
-      target[$$NODE] = value;
+    if (key === $$node) {
+      target[$$node] = value;
     } else {
-      const node = target[$$NODE];
+      const node = target[$$node];
       if (node) {
         node[key] = value;
       } else {
-        target[$$PROPS][key] = value;
+        target[$$props][key] = value;
       }
     }
 
@@ -112,13 +110,21 @@ function createElement(type, props, ...children) {
   props = props || {};
 
   switch (typeof type) {
+    case 'symbol':
+      return new Proxy({
+        [type]: true,
+        [$$methods]: elementMethodHandlers,
+        [$$props]: {
+          children
+        }
+      }, elementProxyHandler);
     case 'string':
       // Theoretically we could create a mock HTMLElement with
       // every property in the spec as a getter/setter
       // which would have better browser support. Maybe later?
       return new Proxy({
-        [$$METHODS]: elementMethodHandlers,
-        [$$PROPS]: {
+        [$$methods]: elementMethodHandlers,
+        [$$props]: {
           ...props,
           tagName: type.toUpperCase(),
           children

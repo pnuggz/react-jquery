@@ -1,7 +1,3 @@
-/** @jsx createElement */
-
-import { createElement } from 'lazy-dom';
-
 const TodoList = ({ todos }) => (
   <ul>
     {todos.map(text =>

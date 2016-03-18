@@ -1,5 +1,11 @@
-import { $$NODE, $$PROPS } from './symbols';
+import { $$node, $$props, $$isStatic } from './symbols';
 import patchChildren from './patchChildren';
+
+function createStaticNode(elementAsString) {
+  const template = document.createElement('template');
+  template.innerHTML = elementAsString;
+  return template.content.firstElementChild;
+}
 
 export default
 function patchNode(prevNode, nextElement, parentNode) {
@@ -7,14 +13,29 @@ function patchNode(prevNode, nextElement, parentNode) {
     return;
   }
 
-  const nextProps = nextElement[$$PROPS];
+  // Elements marked as static cannot change or be moved during a diff
+  // so are only created once then left where they are untouched including
+  // all of their children.
+  if (nextElement[$$isStatic]) {
+    // Only happens on the first render
+    if (!prevNode) {
+      const node = nextElement[$$node] || (
+        nextElement[$$node] = createStaticNode(nextElement[$$props].children[0])
+      );
+      parentNode.appendChild(node);
+    }
+
+    return;
+  }
+
+  const nextProps = nextElement[$$props];
 
   if (nextProps) {
     const { children } = nextProps;
 
     if (prevNode) {
       if (prevNode.tagName === nextProps.tagName) {
-        nextElement[$$NODE] = prevNode;
+        nextElement[$$node] = prevNode;
 
         patchChildren(prevNode, prevNode, children);
 
@@ -26,7 +47,7 @@ function patchNode(prevNode, nextElement, parentNode) {
           }
         }
 
-        const nextNode = nextElement[$$NODE];
+        const nextNode = nextElement[$$node];
 
         if (nextNode && nextNode !== prevNode) {
           const { childNodes } = nextNode;
@@ -40,8 +61,8 @@ function patchNode(prevNode, nextElement, parentNode) {
         return patchNode(null, nextElement, parentNode);
       }
     } else {
-      const nextNode = nextElement[$$NODE] || (
-        nextElement[$$NODE] = document.createElement(nextProps.tagName)
+      const nextNode = nextElement[$$node] || (
+        nextElement[$$node] = document.createElement(nextProps.tagName)
       );
 
       patchChildren(prevNode, nextNode, children);

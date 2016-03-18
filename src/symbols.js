@@ -1,3 +1,4 @@
-export const $$NODE = Symbol('$$NODE');
-export const $$PROPS = Symbol('$$PROPS');
-export const $$METHODS = Symbol('$$METHODS');
+export const $$node = Symbol('$$node');
+export const $$props = Symbol('$$props');
+export const $$methods = Symbol('$$methods');
+export const $$isStatic = Symbol('$$isStatic');
