@@ -19,7 +19,10 @@ const { slice } = Array.prototype;
 // This method became pretty ugly when trying to optimize away excess array
 // allocations (to the extreme) but still flatten [child, [child, [child]]] etc
 // on the fly. I'd love to revisit this, but be careful to measure memory usage
-// in extreme examples like DBMonster since this is a hot code path
+// in extreme examples like DBMonster since this is a hot code path. We still
+// have plenty of JS CPU headroom so any ways we can remove memory alloc the
+// better because garbage collection is still not ideal in the extreme
+// benchmarks like DBMonster
 export default
 function patchChildren(prevNode, nextNode, children, leftOversOverride, offset = 0) {
   const leftOvers = leftOversOverride || (prevNode ? slice.call(prevNode.childNodes) : null);

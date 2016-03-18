@@ -7,15 +7,15 @@ import patchNode from './patchNode';
   const nativeRemoveChild = nodeProto.removeChild;
 
   function elementToNode(element) {
-    element = element[$$node];
+    let node = element[$$node];
 
-    if (!element) {
+    if (!node) {
       const template = document.createElement('template');
       patchNode(null, element, template);
-      element = template.content.firstChild;
+      node = template.firstChild;
     }
 
-    return element;
+    return node;
   }
 
   nodeProto.appendChild = function appendChild(childNode)  {
@@ -138,34 +138,14 @@ const elementProxyHandler = {
   }
 };
 
-// These are used whenever the element creator doesn't
-// provide them, so that the API surface is always the
-// same but made completely immutable so they don't
-// cause really weird bugs
-const emptyChildren = Object.freeze([]);
-const emptyProps = Object.freeze({ children: emptyChildren });
+const emptyProps = Object.freeze({});
 
 // Used later to convert `arguments` to an array
 const { slice } = Array.prototype;
 
 export default
-function createElement(type, props) {
+function createElement(type, props, ...children) {
   props = props || emptyProps;
-
-  /*const children = (arguments.length > 2)
-    ? slice.call(arguments, 2, arguments.length)
-    : emptyChildren;*/
-
-  let children = emptyChildren;
-
-  if (arguments.length > 2) {
-    const thirdChild = arguments[2];
-    if (arguments.length === 3 && thirdChild && thirdChild[$$isElement]) {
-      children = thirdChild;
-    } else {
-      children = slice.call(arguments, 2, arguments.length)
-    }
-  }
 
   switch (typeof type) {
     case 'symbol':
