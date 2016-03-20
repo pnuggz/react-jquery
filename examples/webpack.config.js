@@ -16,7 +16,9 @@ function findEntries(rootDir) {
 
 module.exports = {
   devtool: 'inline-source-map',
-  entry: Object.assign({}, findEntries(lazyDOMDir), findEntries(reactDir)),
+  entry: Object.assign({
+    'lazy-dom-polyfill': './src/polyfill.js',
+  }, findEntries(lazyDOMDir), findEntries(reactDir)),
   output: {
     path: __dirname + '/__build__',
     filename: '[name].js',

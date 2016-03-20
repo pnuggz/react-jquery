@@ -2,13 +2,7 @@
   "presets": ["es2015", "react"],
   "plugins": [
     ["babel-plugin-transform-react-jsx", {
-      "pragma": "createElement",
-    }],
- 
-    ["babel-plugin-jsx-pragmatic", {
-      "module": "lazy-dom",
-      "import": "createElement",
-      "export": "createElement"
+      "pragma": "document.createLazyElement",
     }]
   ]
 }
