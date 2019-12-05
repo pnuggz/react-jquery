@@ -2,7 +2,7 @@
   "presets": ["es2015", "react"],
   "plugins": [
     ["babel-plugin-transform-react-jsx", {
-      "pragma": "document.createLazyElement",
+      // "pragma": "document.createLazyElement",
     }]
   ]
 }

@@ -26,11 +26,16 @@ module.exports = {
     publicPath: '/__build__/'
   },
   module: {
-    loaders: [{
-      test: /\.js$/,
-      exclude: /node_modules/,
-      loader: 'babel'
-    }]
+    loaders: [
+      {
+        test: /\.js$/,
+        loader: 'babel'
+      },
+      { 
+        test: /\.json$/, 
+        loader: "json-loader" 
+      }
+    ]
   },
   resolve: {
     alias: {
@@ -39,7 +44,8 @@ module.exports = {
   },
   externals: {
     'react': 'React',
-    'react-dom': 'ReactDOM'
+    'react-dom': 'ReactDOM',
+    'react-dom/server': 'ReactDOMServer'
   },
   plugins: [
     new webpack.optimize.CommonsChunkPlugin('shared.js'),

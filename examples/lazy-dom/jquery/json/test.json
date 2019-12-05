@@ -1,0 +1,197 @@
+{
+  "id": 4424,
+  "type": "Order",
+  "pdf_file": {
+    "file_name": "ausnet_bcard_id4424.pdf",
+    "output_title": "AusNet_Business_Card"
+  },
+  "page_boxes": {
+    "trim_box": {
+      "type": "relative",
+      "width": "11.64",
+      "height": "11.64"
+    }
+  },
+  "canvas": {
+    "reload": true,
+    "pages": [2],
+    "crop": [30, 30],
+    "style": [
+      {
+        "boxShadow": "rgba(0, 0, 0, 0.2) 0px 4px 8px 0px, rgba(0, 0, 0, 0.19) 0px 6px 20px 0px"
+      },
+      {
+        "marginTop": "110px"
+      }
+    ]
+  },
+  "custom_script": {
+    "file": ["functions.js", "ausnet_bcard_id4424.js"],
+    "onload": ["start()"]
+  },
+  "fonts": [
+    {
+      "name": "nettoot_regular",
+      "file": "nettoot_regular.php",
+      "browser": "nettoot_regular.ttf"
+    },
+    {
+      "name": "nettootb",
+      "file": "nettootb.php",
+      "browser": "nettootb.ttf"
+    }
+  ],
+  "colors": [
+    {
+      "color_id": "orange",
+      "type": "CMYK",
+      "code": ["0", "74", "100", "0"]
+    },
+    {
+      "color_id": "black",
+      "type": "CMYK",
+      "code": ["0", "0", "0", "100"]
+    },
+    {
+      "color_id": "blue",
+      "type": "CMYK",
+      "code": ["93", "81", "1", "0"]
+    }
+  ],
+  "pages": [
+    {
+      "number": "1",
+      "elements": []
+    },
+    {
+      "number": "2",
+      "elements": [
+        {
+          "element": "text",
+          "element_id": "name",
+          "element_label": "Name",
+          "font": "nettootb",
+          "color_id": "black",
+          "size": "10",
+          "position": {
+            "x": "17.7",
+            "y": "39.49",
+            "align": "L"
+          },
+          "default_value": {
+            "type": "auto",
+            "key": "user.name.full"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "title",
+          "element_label": "Title",
+          "font": "nettoot_regular",
+          "color_id": "black",
+          "size": "9",
+          "position": {
+            "x": "17.7",
+            "y": "43.38",
+            "align": "L"
+          }
+        },        
+        {
+          "element": "text",
+          "element_id": "address",
+          "element_label": "Address",
+          "font": "nettoot_regular",
+          "color_id": "black",
+          "size": "8.6",
+          "position": {
+            "x": "17.7",
+            "y": "49.92",
+            "align": "L"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "phone",
+          "element_label": "Telephone",
+          "skip": true,
+          "rules": {
+            "conditions": [
+              {
+                "event": "input",
+                "function": ["contactOutput()"]
+              }
+            ]
+          },
+          "default_value": {
+            "type": "auto",
+            "key": "user.phone"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "mobile",
+          "element_label": "Mobile",
+          "skip": true,
+          "rules": {
+            "conditions": [
+              {
+                "event": "input",
+                "function": ["contactOutput()"]
+              }
+            ]
+          },
+          "default_value": {
+            "type": "auto",
+            "key": "user.mobile"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "contact",
+          "element_label": "",
+          "visibility": "hidden",
+          "font": "nettoot_regular",
+          "color_id": "black",
+          "size": "8.6",
+          "position": {
+            "x": "17.7",
+            "y": "53.55",
+            "align": "L"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "email",
+          "element_label": "Email",
+          "skip": true,
+          "rules": {
+            "conditions": [
+              {
+                "event": "input",
+                "function": ["emailOutput()"]
+              }
+            ]
+          },
+          "default_value": {
+            "type": "auto",
+            "key": "user.email"
+          }
+        },
+        {
+          "element": "text",
+          "element_id": "email_output",
+          "element_label": "",
+          "visibility": "hidden",
+          "font": "nettoot_regular",
+          "color_id": "black",
+          "size": "8.6",
+          "position": {
+            "x": "17.7",
+            "y": "57.18",
+            "align": "L"
+          }
+        }
+      ]
+    }
+  ]
+}

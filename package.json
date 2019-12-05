@@ -31,6 +31,7 @@
     "express": "^4.13.3",
     "express-urlrewrite": "^1.2.0",
     "imports-loader": "^0.6.5",
+    "json-loader": "^0.5.7",
     "karma": "^0.13.10",
     "karma-chrome-launcher": "^0.2.0",
     "karma-mocha": "^0.2.0",
@@ -45,5 +46,10 @@
     "source-map": "^0.5.1",
     "webpack": "^1.12.1",
     "webpack-dev-server": "^1.10.1"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-dom-server": "0.0.5"
   }
 }

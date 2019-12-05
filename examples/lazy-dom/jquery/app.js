@@ -1,51 +1,224 @@
-/**
- * One of the many issues with virtual DOM instead of real DOM
- * is that it makes it awkward (or sometimes even impossible)
- * to integrate with libraries that need access to the real DOM.
- * 
- * lazy-dom elements can be consumed exactly how you would
- * would consume real DOM elements! The trick is a bit complicated
- * but the idea is that lazy-dom elements are actually more like
- * "element placeholders" similar to virtual DOM elements
- * except they can be consumed by code expecting a real DOM
- * element and will lazily create the real DOM element
- * and proxy into it when neccesary.
- * 
- * Things get much more complicated when dealing with diffs
- * so I encourage you to read the ARCHITECTURE.md doc if
- * you really would like to know how it works.
- */
+// ES modules
+import React from 'react'
+import ReactDOM from 'react-dom'
+import * as customFunctions from "./customFunction/test"
+const json = require('./json/test.json');
 
-$.fn.counter = function counter() {
-  let count = 0;
+json.name = 0
+json.input = ''
+json.pages.forEach((page, pageIndex) => {
+  if(page.elements.length === 0) {
+    return true
+  }
 
-  const $count = $(`<div>${count}</div>`);
-  const $button = $('<button>Increase</button>');
+  page.elements.forEach((element, elementIndex ) => {
+    if(element.default_value) {
+      const defaultConfig = element.default_value
+      const defaultType = defaultConfig.type.toLowerCase()
+  
+      switch(defaultType) {
+        case 'auto': 
+          json.pages[pageIndex].elements[elementIndex].template_untrimmed_value = 'TEST TEST TEST'
+          break;
+        case 'manual':
+          json.pages[pageIndex].elements[elementIndex].template_untrimmed_value = defaultConfig.value
+          break;
+        default:
+          break;
+      }
+    } else {
+      json.pages[pageIndex].elements[elementIndex].template_untrimmed_value = ''
+    }
+  })
+})
 
-  $button.on('click', () => {
-    count++
-    $count.text(`${count}`);
-  });
+// The initial configuration props
+window.jsonprops = json
 
-  this.append($count);
-  this.append($button);
+const jsonprops = window.jsonprops
 
-  return this;
-};
+const jsonpropValueSetter = (id, val) => {
+  window.jsonprops.pages.forEach((page, pageIndex) => {
+    if(page.elements.length === 0) {
+      return true
+    }
 
-const Application = () => {
-  let counter = <div id="counter" />;
+    page.elements.forEach((element, elementIndex ) => {
+      if(element.element_id === id) {
+        window.jsonprops.pages[pageIndex].elements[elementIndex].template_untrimmed_value = val
+      }
+    })
+  })
+}
 
-  // lazy-dom JSX elements can be treated as
-  // if they they were actual DOM nodes!
-  $(counter).counter();
+const InputText = (element) => {
+  const id = element.element_id
+  return (
+    <div>
+      <p>{element.element_label}</p>
+      <p><input key={id} id={id} type="text" value={element.template_untrimmed_value} onChange={() => {}} /></p>
+    </div>
+  )
+}
+
+const FormGenerator = (props) => {
+  const config = props
+  const elements = config.pages
+  .filter((page) => {
+    if(page.elements.length === 0) {
+      return false
+    }
+    return true
+  })
+  .map((page) => {
+    return page.elements.map((element) => {
+      return element
+    })
+  })
+  .flat()
+
+  const renderForm = () => {
+    return elements.map((element) => {
+      const elemType = element.element.toLowerCase()
+
+      switch(elemType) {
+        case 'text': 
+          return <InputText {...element} />
+        default:
+          return null
+      }
+    })
+  }
 
   return (
     <div>
-      <h2>jQuery Counter</h2>
-      {counter}
+      {renderForm()}
     </div>
-  );
+  )
+}
+
+// This is where it finally renders the whole templating application
+const Application = (jsonprops) => {
+  return(
+    <div>
+      <h1>{jsonprops.id}</h1>
+      <FormGenerator {...jsonprops} />
+    </div>
+  )
+}
+
+const render = () => {
+  // This is where the form is rerendered
+  ReactDOM.render(<Application {...jsonprops} />, document.getElementById('template__form-wrapper'))
+
+  // This is where the canvas is rerender
+  // getAllInputData(true)
+  // blah blah blah
+}
+
+
+// This is the initial render
+render()
+
+
+// This is where prefilled data is injected
+// $('#userselect').on('change', () => { .... render()})
+
+
+
+
+
+// Functions to bind event listeners
+const defaultInputFunction = (event) => {
+  const id = $(event.target).attr('id')
+  const val = $(event.target).val()
+  jsonpropValueSetter(id, val)
+}
+
+const customFunctionCreator = (element, condition) => {
+  const elemId = element.element_id
+
+  $(`#${elemId}`).on('input change', (event) => {
+    if(Array.isArray(condition.function)) {
+      for(let i = 0; i<condition.function.length; i++) {
+        eval(`customFunctions.${condition.function[i]}`)
+      }
+    } else {
+      eval(`customFunctions.${condition.function}`)
+    }
+
+    render()
+  })
+}
+
+const defaultFunctionCreator = (element) => {
+  const elemType = element.element
+  const elemId = element.element_id
+
+  $(`#${elemId}`).on('input change', (event) => {
+    if(
+      elemType === "text"
+    ) {
+      defaultInputFunction(event)
+    }
+    
+    render()
+  })
+}
+
+
+// Custom function binding on INPUT & CHANGE
+window.jsonprops.pages.forEach(page => {
+  if(page.elements.length === 0) {
+    return true
+  }
+
+  page.elements.forEach(element => {
+    if(element.rules && element.rules.conditions) {
+      element.rules.conditions.forEach(condition => {
+        customFunctionCreator(element, condition)
+      })
+    } else {
+      defaultFunctionCreator(element)
+    }
+  })
+});
+
+
+
+
+// proxy handler
+const handler = {
+  set(target, key, value) {
+    target[key] = value;
+    render()
+  },
 };
 
-document.body.appendChild(<Application />);
+// window.jsonprops.on('propUpdate', () => { render() })
+window.updateJsonprops = {}
+
+let i = 0;
+const callbackProxy = (object) => {
+  let key = i
+
+  if(typeof object === "object") {
+    Object.keys(object).forEach((objkey) => {
+      key = objkey
+      const obj = object[objkey]
+      callbackProxy(obj)
+    })
+  } else if (typeof object === "array") {
+    object.forEach((obj,arrKey) => {
+      key = arrKey
+      callbackProxy(obj)
+    })
+  } else {
+    let prox = new Proxy(window.jsonprops, handler)
+    window.updateJsonprops.jsonprops = prox
+  }
+
+  i++
+}
+
+callbackProxy(window.jsonprops)
